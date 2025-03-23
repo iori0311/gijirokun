@@ -1,4 +1,3 @@
-
 # 議事録自動作成サーバレスWebアプリ 要件定義ドキュメント
 
 ## 1. プロジェクト概要
@@ -13,7 +12,7 @@
   - AssemblyAI API を利用した Speech to Text による文字起こし  
   - Google Gemini APIを利用したテキスト要約生成  
   - 原文（文字起こし）と要約の閲覧機能  
-  - ユーザー認証 (AWS Cognito を利用)
+  - ユーザー認証 (Supabase Auth を利用)
 
 ## 2. システムアーキテクチャ
 
@@ -21,13 +20,16 @@
 - フレームワーク: React / Next.js（App Router、TypeScript）
 - SSRとSSGの併用、最新の公式ベストプラクティスに基づいた設計
 - ユーザーインターフェースでのファイルアップロード、要約/全文表示、ログイン機能を提供
+- Supabase Client SDKを利用した認証・データ操作
 
 ### バックエンド
-- AWS Lambda（FFmpegによる音声変換、Gemini API呼び出し）
-- API Gateway 経由でLambdaと通信
-- S3：音声・変換後MP3・文字起こしデータの保存
-- DynamoDB（またはS3メタデータ）：議事録メタ情報の管理
-- AWS Cognito：ユーザー認証・セッション管理
+- Supabase Platform
+  - Auth：ユーザー認証・セッション管理
+  - Storage：音声ファイル・文字起こしデータの保存
+  - Database：PostgreSQLによる議事録メタ情報の管理
+  - Edge Functions：音声変換処理、API連携（FFmpeg、Gemini API）
+  - Row Level Security：データアクセス制御
+- リアルタイムサブスクリプション機能による処理状態の即時反映
 
 ### 外部API
 - AssemblyAI API: 音声 -> テキスト の処理を担当
@@ -36,35 +38,38 @@
 ## 3. 機能要件
 
 - ユーザーは認証後、音声ファイルをアップロード
-- 音声ファイルはLambdaでMP3に変換後、Geminiに渡して文字起こし
+- 音声ファイルはEdge FunctionでMP3に変換後、AssemblyAIに渡して文字起こし
 - Geminiで要約も実施
-- 全文・要約データはS3/DynamoDBに保存され、UIで閲覧可能
+- テキストデータのアップロード・要約も可能
+- 全文・要約データはSupabase Storage/Databaseに保存され、UIで閲覧可能
 
 ## 4. 非機能要件
 
-- AWSの無料枠を最大限活用
+- Supabaseの無料枠を最大限活用
 - TypeScriptによる型安全な開発
-- セキュリティ（認証付きアクセス制御、暗号化、IAM管理）
+- セキュリティ（RLS、認証付きアクセス制御）
 - パフォーマンス（SSGの活用、UIの応答性）
+- リアルタイム更新によるUXの向上
 
 ## 5. 将来の拡張（RAG）
 
 - レスポンシブ対応し、スマートフォンからのアクセスでも使いやすいUIにする。
-- 文字起こしデータをベクトル化し、類似検索（RAG）に活用
-- Pinecone / Weaviate 等との連携を視野に入れた構成設計
+- PostgreSQLのpgvector拡張を利用した類似検索（RAG）の実装
+- Supabase Database Functions/Webhooksを活用した自動処理の拡張
 
 ## 6. システム処理フロー
 
-1. 認証（Cognito）
-2. 音声アップロード（S3）
-3. Lambdaで変換＆Gemini呼び出し
-4. 結果保存（S3/DynamoDB）
-5. フロントエンドで一覧＆詳細表示
+1. 認証（Supabase Auth）
+2. 音声アップロード（Supabase Storage）
+3. Edge Functionで変換＆Gemini呼び出し
+4. 結果保存（Storage/Database）
+5. リアルタイム更新でUI反映
 
 ## 7. 注意点・課題
 
 - Gemini API の料金管理
-- 無料枠の消費モニタリング
-- Lambda実行時間と処理サイズ制限の考慮
-- 適切なS3/Lambdaのセキュリティ設定
+- Supabase無料枠の利用状況モニタリング
+- Edge Functions実行時間と処理サイズ制限の考慮
+- RLSポリシーの適切な設定
+- ストレージ使用量の最適化
 

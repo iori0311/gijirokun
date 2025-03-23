@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- docs/gijirokun.md, development.md, architectura.mdを元に開発を進めます。
+- 作業はGitHubのIssue単位で行い、PRもIssueと対応するように発行する。
+- 実装内容に変更が生じた際は上記のマークダウンファイルとIssueを更新し、常にドキュメントの同期をとるとる。

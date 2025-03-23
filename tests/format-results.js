@@ -14,26 +14,48 @@ function formatTestResults() {
       const rawOutput = readFileSync(`test_results/${type}.txt`, 'utf8');
       const resultJson = JSON.parse(readFileSync(`test_results/${type}.txt.json`, 'utf8'));
       
-      // テスト結果のステータスを判定
-      const status = resultJson.status === 'success' ? '✅' : '❌';
-      overallStatus = resultJson.status === 'failure' ? '❌ 失敗' : overallStatus;
+      // 複数のエラー結果がある場合
+      if (resultJson.results) {
+        const status = resultJson.results.some(r => r.status === 'failure') ? '❌' : '✅';
+        overallStatus = resultJson.results.some(r => r.status === 'failure') ? '❌ 失敗' : overallStatus;
 
-      // 結果の詳細を整形
-      let details = '';
-      if (resultJson.type === 'expected_error') {
-        details = `\n> 期待されたエラー ${resultJson.error_code} を検出`;
-      } else if (resultJson.type === 'wrong_error') {
-        details = `\n> ❌ 期待されたエラー ${resultJson.expected} が発生しませんでした`;
-      } else if (resultJson.type === 'unexpected_error') {
-        details = `\n> ❌ 予期せぬエラー: ${resultJson.message}`;
+        // 各エラー結果の詳細を整形
+        const details = resultJson.results.map(result => {
+          if (result.type === 'expected_error') {
+            return `\n> ✅ 期待されたエラー ${result.error_code} を検出`;
+          } else if (result.type === 'wrong_error') {
+            return `\n> ❌ 期待されたエラー ${result.expected} が発生しませんでした`;
+          }
+          return '';
+        }).join('\n');
+
+        allResults.push({
+          type: type,
+          status: status,
+          output: rawOutput,
+          details: details
+        });
+      } else {
+        // 単一の結果の場合（以前の形式）
+        const status = resultJson.status === 'success' ? '✅' : '❌';
+        overallStatus = resultJson.status === 'failure' ? '❌ 失敗' : overallStatus;
+
+        let details = '';
+        if (resultJson.type === 'expected_error') {
+          details = `\n> 期待されたエラー ${resultJson.error_code} を検出`;
+        } else if (resultJson.type === 'wrong_error') {
+          details = `\n> ❌ 期待されたエラー ${resultJson.expected} が発生しませんでした`;
+        } else if (resultJson.type === 'unexpected_error') {
+          details = `\n> ❌ 予期せぬエラー: ${resultJson.message}`;
+        }
+
+        allResults.push({
+          type: type,
+          status: status,
+          output: rawOutput,
+          details: details
+        });
       }
-
-      allResults.push({
-        type: type,
-        status: status,
-        output: rawOutput,
-        details: details
-      });
     } catch (error) {
       console.error(`Error reading test results for ${type}:`, error);
       overallStatus = '❌ 失敗';

@@ -4,7 +4,7 @@
 -- Create テスト
 -- 新しい会議を作成できることを確認
 INSERT INTO meetings (id, user_id, title, input_type, status)
-VALUES ('44444444-4444-4444-4444-444444444444', '12345678-1234-1234-1234-123456789012', 'CREATEテスト会議', 'text', 'pending')
+VALUES ('44444444-4444-4444-4444-444444444444', '12345678-1234-1234-1234-123456789012', 'CREATEテスト会議', 'text', 'created')
 RETURNING *;
 
 -- Read テスト

@@ -2,10 +2,8 @@ name: Database Tests
 
 on:
   pull_request:
+    types: [opened, synchronize]
     branches: [ main ]
-    paths:
-      - 'supabase/**'
-      - 'tests/**'
 
 # 権限設定を追加
 permissions:
@@ -20,6 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
@@ -28,82 +31,35 @@ jobs:
       - name: Start Supabase local development setup
         run: supabase start
 
-      - name: Run database migrations
-        run: |
-          # マイグレーションの実行（自動で実行されるはず）
-          supabase db reset
-
       - name: Run database tests
         id: run-tests
         run: |
-          # テスト結果を保存するディレクトリを作成
-          mkdir -p test_results
-
-          # シードデータの投入
-          PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f supabase/seed.sql
-
-          # テスト実行結果を変数に保存
-          test_status=0
-
-          echo "Running CRUD tests..."
-          PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/integration/db/crud.test.sql > test_results/crud.txt 2>&1
-          if [ $? -ne 0 ]; then test_status=1; fi
+          # テスト実行スクリプトに実行権限を付与
+          chmod +x tests/run-db-tests.sh
           
-          echo "Running RLS tests..."
-          PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/integration/db/rls.test.sql > test_results/rls.txt 2>&1
-          if [ $? -ne 0 ]; then test_status=1; fi
-          
-          echo "Running constraints tests..."
-          PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/integration/db/constraints.test.sql > test_results/constraints.txt 2>&1
-          if [ $? -ne 0 ]; then test_status=1; fi
-
-          # テスト結果をoutputとして保存
-          echo "test_status=$test_status" >> $GITHUB_OUTPUT
-          exit $test_status
+          # テストを実行
+          ./tests/run-db-tests.sh
+        
+      - name: Format test results
+        if: always()
+        id: format-results
+        run: |
+          node --experimental-json-modules tests/format-results.js
 
       - name: Post test results
         if: always()
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const testStatus = process.env.TEST_STATUS === '0' ? '✅ 成功' : '❌ 失敗';
+            const { readFileSync } = await import('fs');
+            const formattedResults = readFileSync('test_results/formatted_results.md', 'utf8');
             
-            // テスト結果を読み込む
-            const crudResults = fs.readFileSync('test_results/crud.txt', 'utf8');
-            const rlsResults = fs.readFileSync('test_results/rls.txt', 'utf8');
-            const constraintsResults = fs.readFileSync('test_results/constraints.txt', 'utf8');
-            
-            // マークダウン形式でコメントを作成
-            const body = `## データベーステスト結果 🔍
-            
-            **テスト結果: ${testStatus}**
-
-            ### 1. CRUD操作テスト
-            \`\`\`sql
-            ${crudResults}
-            \`\`\`
-
-            ### 2. RLSポリシーテスト
-            \`\`\`sql
-            ${rlsResults}
-            \`\`\`
-
-            ### 3. 制約テスト
-            \`\`\`sql
-            ${constraintsResults}
-            \`\`\`
-            `;
-            
-            // PRにコメントを投稿
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: body
+              body: formattedResults
             });
-        env:
-          TEST_STATUS: ${{ steps.run-tests.outputs.test_status }}
 
       - name: Stop Supabase local development setup
         if: always()

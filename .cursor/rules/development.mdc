@@ -1,8 +1,22 @@
 ---
-description: 
-globs: 
+description: "開発フローとドキュメント同期のルール"
+globs: ["**/*"]
 alwaysApply: true
 ---
-- docs/gijirokun.md, development.md, architectura.mdを元に開発を進めます。
-- 作業はGitHubのIssue単位で行い、PRもIssueと対応するように発行する。
-- 実装内容に変更が生じた際は上記のマークダウンファイルとIssueを更新し、常にドキュメントの同期をとるとる。
+rules:
+  - name: "ドキュメント同期"
+    description: "開発時のドキュメント同期ルール"
+    rules:
+      - docs/gijirokun.md, development.md, architectura.mdを常に確認して開発を進めます。
+      - 作業はGitHubのIssue単位で行い、PRもIssueと対応するように発行する。
+      - 実装内容に変更が生じた際は上記のマークダウンファイルとIssueを更新し、常にドキュメントの同期をとる。
+
+  - name: "実装ルール"
+    description: "実装に関する制約"
+    rules:
+      - ユーザーが実装を行いエージェントはソースコードの実装を行わない
+
+  - name: "Supabase開発"
+    description: "Supabase関連の開発ルール"
+    rules:
+      - Supabaseの機能については都度説明を行い、理解を深めながら開発を進める

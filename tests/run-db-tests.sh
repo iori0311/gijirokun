@@ -67,9 +67,9 @@ supabase db reset
 
 # テストデータの準備
 yellow "Preparing test data..."
-PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f supabase/pre-seed.sql
-PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f supabase/test-seed.sql
-PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f supabase/post-seed.sql
+PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/set-up/pre-seed.sql
+PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/set-up/test-seed.sql
+PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/set-up/post-seed.sql
 
 # テストの実行
 test_status=0

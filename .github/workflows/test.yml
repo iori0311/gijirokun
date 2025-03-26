@@ -1,0 +1,66 @@
+name: Database Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+
+# 権限設定を追加
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local development setup
+        run: supabase start
+
+      - name: Run database tests
+        id: run-tests
+        run: |
+          # テスト実行スクリプトに実行権限を付与
+          chmod +x tests/run-db-tests.sh
+          
+          # テストを実行
+          ./tests/run-db-tests.sh
+        
+      - name: Format test results
+        if: always()
+        id: format-results
+        run: |
+          node --experimental-json-modules tests/format-results.js
+
+      - name: Post test results
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { readFileSync } = await import('fs');
+            const formattedResults = readFileSync('test_results/formatted_results.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: formattedResults
+            });
+
+      - name: Stop Supabase local development setup
+        if: always()
+        run: supabase stop 

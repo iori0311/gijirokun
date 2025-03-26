@@ -1,0 +1,4 @@
+-- トリガーの再有効化
+ALTER TABLE meetings ENABLE TRIGGER ALL;
+ALTER TABLE transcriptions ENABLE TRIGGER ALL;
+ALTER TABLE summaries ENABLE TRIGGER ALL; 

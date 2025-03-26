@@ -41,11 +41,7 @@ jobs:
       - name: Run storage tests
         id: run-storage-tests
         run: |
-          # テスト実行スクリプトに実行権限を付与
-          chmod +x tests/run-storage-tests.sh
-          
-          # テストを実行
-          ./tests/run-storage-tests.sh
+          npm run test:storage
       
       - name: Post test results to PR
         if: always()

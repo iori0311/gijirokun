@@ -8,8 +8,8 @@ describe('Storage Bucket Tests', () => {
 
   beforeEach(async () => {
     supabase = createClient(
-      process.env.SUPABASE_URL ?? '',
-      process.env.SUPABASE_ANON_KEY ?? ''
+      process.env.TEST_SUPABASE_URL ?? '',
+      process.env.TEST_SUPABASE_ANON_KEY ?? ''
     );
 
     // デフォルトで認証済み状態にする

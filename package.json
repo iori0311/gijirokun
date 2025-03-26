@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:storage": "vitest run './tests/integration/storage/**/*.test.ts'"
+    "test:storage": "vitest run './tests/integration/storage/**/*.test.ts' --logLevel=debug --threads=false"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

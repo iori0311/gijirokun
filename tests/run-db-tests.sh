@@ -50,7 +50,17 @@ run_test() {
     fi
   else
     # 複数のエラー結果をJSONの配列として保存
-    echo "{\"results\": [${errors[*]}]}" > "${output_file}.json"
+    first=true
+    json_array=""
+    for error in "${errors[@]}"; do
+      if [ "$first" = true ]; then
+        json_array="$error"
+        first=false
+      else
+        json_array="$json_array,$error"
+      fi
+    done
+    echo "{\"results\": [$json_array]}" > "${output_file}.json"
     if grep -q "\"status\": \"failure\"" "${output_file}.json"; then
       red "❌ Some expected errors did not match"
       return 1

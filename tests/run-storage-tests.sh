@@ -11,6 +11,14 @@ yellow() { echo -e "\033[33m$1\033[0m"; }
 yellow "Debug: Current working directory and files"
 pwd
 find . -name "*.test.ts" -type f
+yellow "Debug: Test file location check"
+if [ -f "./tests/integration/storage/storage.test.ts" ]; then
+    yellow "Test file exists at expected path"
+else
+    red "Test file not found at expected path"
+    exit 1
+fi
+
 yellow "Debug: Environment variables"
 env | grep -E "SUPABASE|TEST"
 
@@ -20,37 +28,38 @@ supabase status
 
 # 停止しているサービスがあれば再起動
 if supabase status | grep -q "Stopped services"; then
-  yellow "Some services are stopped. Restarting Supabase..."
-  supabase stop
-  supabase start
+    yellow "Some services are stopped. Attempting restart..."
+    supabase stop || true  # stopが失敗しても続行
+    sleep 2
+    supabase start
+    sleep 5  # 起動を待つ
 fi
 
-# データベースの起動確認
-yellow "Waiting for database to be ready..."
-max_attempts=30
-attempt=0
-while ! supabase status | grep -q "Database online"; do
-  if [ $attempt -eq $max_attempts ]; then
-    red "Database failed to start after $max_attempts attempts"
+# データベース接続の確認（実際の出力に合わせて修正）
+yellow "Checking database connection..."
+if supabase status | grep -q "DB URL: .*54322/postgres"; then
+    yellow "Database connection confirmed"
+else
+    red "Database connection not found"
+    supabase status  # 詳細な状態を表示
     exit 1
-  fi
-  yellow "Waiting for database... (attempt $((attempt + 1))/$max_attempts)"
-  sleep 2
-  ((attempt++))
-done
+fi
 
-# テストの実行
-yellow "Running storage tests..."
-npm run test:storage
+# テストファイルの場所を考慮してテストを実行
+yellow "Running storage tests with verbose output..."
+cd /home/runner/work/gijirokun/gijirokun  # 明示的にディレクトリを指定
+DEBUG=vite:* VITEST_LOG_LEVEL=debug npm run test:storage
 
 # 終了コードの保存
 test_status=$?
 
 # 結果の表示
 if [ $test_status -eq 0 ]; then
-  green "🎉 All storage tests passed!"
+    green "🎉 All storage tests passed!"
 else
-  red "❌ Some storage tests failed"
+    red "❌ Some storage tests failed"
+    yellow "Debug: Final status check"
+    supabase status
 fi
 
 exit $test_status 

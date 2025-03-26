@@ -16,6 +16,7 @@ export default defineConfig({
       '**/*.{test,spec}.{js,jsx,ts,tsx}'
     ],
     exclude: ['node_modules', '.next', 'dist'],
+    globalSetup: './tests/set-up/global-setup.ts',
     globals: true,
     root: '.',  // プロジェクトルートを明示的に指定
     resolveSnapshotPath: (testPath, snapExtension) => {

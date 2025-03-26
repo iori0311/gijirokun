@@ -45,10 +45,13 @@ else
     exit 1
 fi
 
-# テストファイルの場所を考慮してテストを実行
-yellow "Running storage tests with verbose output..."
-cd /home/runner/work/gijirokun/gijirokun  # 明示的にディレクトリを指定
-DEBUG=vite:* VITEST_LOG_LEVEL=debug npm run test:storage
+# テストファイルの場所を確認
+yellow "Debug: Test file contents"
+cat ./tests/integration/storage/storage.test.ts | head -n 20  # 最初の20行だけ表示
+
+# テスト実行時に環境変数を明示的に渡す
+yellow "Running storage tests..."
+TEST_SUPABASE_URL="$TEST_SUPABASE_URL" TEST_SUPABASE_ANON_KEY="$TEST_SUPABASE_ANON_KEY" npm run test:storage
 
 # 終了コードの保存
 test_status=$?

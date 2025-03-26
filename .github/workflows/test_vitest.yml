@@ -41,11 +41,15 @@ jobs:
       - name: Run storage tests
         id: run-storage-tests
         run: |
+          # 作業ディレクトリとファイルの存在確認
+          pwd
+          ls -la tests/integration/storage/
+          
           # テスト実行スクリプトに実行権限を付与
           chmod +x tests/run-storage-tests.sh
-
-          # 環境変数を設定してテストを実行
-          SUPABASE_URL=${{ secrets.TEST_SUPABASE_URL }} SUPABASE_ANON_KEY=${{ secrets.TEST_SUPABASE_ANON_KEY }} ./tests/run-storage-tests.sh
+          
+          # テストを実行
+          ./tests/run-storage-tests.sh
       
       - name: Post test results to PR
         if: always()

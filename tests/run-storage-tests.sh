@@ -7,10 +7,14 @@ green() { echo -e "\033[32m$1\033[0m"; }
 red() { echo -e "\033[31m$1\033[0m"; }
 yellow() { echo -e "\033[33m$1\033[0m"; }
 
-# Supabaseの起動確認のみ行う
-yellow "Checking Supabase status..."
-if ! supabase status | grep -q "Database online"; then
-  yellow "Starting Supabase..."
+# Supabaseの状態確認
+yellow "Checking Supabase services..."
+supabase status
+
+# 停止しているサービスがあれば再起動
+if supabase status | grep -q "Stopped services"; then
+  yellow "Some services are stopped. Restarting Supabase..."
+  supabase stop
   supabase start
 fi
 

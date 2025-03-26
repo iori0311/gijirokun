@@ -1,0 +1,64 @@
+name: Storage Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [ main ]
+
+# 権限設定を追加
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  storage-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local development setup
+        run: supabase start
+
+      - name: Run storage tests
+        id: run-storage-tests
+        run: |
+          # テスト実行スクリプトに実行権限を付与
+          chmod +x tests/run-storage-tests.sh
+
+          # テストを実行
+          ./tests/run-storage-tests.sh
+      
+      - name: Post test results to PR
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const testResult = process.env.TEST_RESULT === "0" ? "✅ ストレージテスト成功" : "❌ ストレージテスト失敗";
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ストレージテスト結果\n\n${testResult}\n\n詳細はログを確認してください。`
+            });
+        env:
+          TEST_RESULT: ${{ steps.run-storage-tests.outcome == 'success' && '0' || '1' }}
+
+      - name: Stop Supabase local development setup
+        if: always()
+        run: supabase stop

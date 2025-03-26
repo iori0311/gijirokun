@@ -10,7 +10,10 @@ if (fs.existsSync('.env.test')) {
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    include: [
+      'tests/integration/storage/**/*.test.ts',
+      '**/*.{test,spec}.{js,jsx,ts,tsx}'
+    ],
     exclude: ['node_modules', '.next', 'dist'],
     globalSetup: './tests/set-up/global-setup.ts'
   }

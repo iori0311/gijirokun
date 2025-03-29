@@ -1,13 +1,3 @@
--- テストユーザーデータ
-DELETE FROM auth.users WHERE id IN (
-  '12345678-1234-1234-1234-123456789012',
-  '98765432-9876-9876-9876-987654321098'
-);
-
-INSERT INTO auth.users (id, email) VALUES
-  ('12345678-1234-1234-1234-123456789012', 'test1@example.com'),
-  ('98765432-9876-9876-9876-987654321098', 'test2@example.com');
-
 -- テスト用会議データ
 INSERT INTO meetings (id, user_id, title, input_type, status) VALUES
   ('11111111-1111-1111-1111-111111111111', '12345678-1234-1234-1234-123456789012', 'テスト会議1', 'text', 'completed'),
@@ -21,4 +11,4 @@ INSERT INTO transcriptions (meeting_id, content, is_direct_input) VALUES
 -- テスト用要約データ
 INSERT INTO summaries (meeting_id, content) VALUES
   ('11111111-1111-1111-1111-111111111111', 'テスト会議1の要約'),
-  ('22222222-2222-2222-2222-222222222222', 'テスト会議2の要約'); 
+  ('22222222-2222-2222-2222-222222222222', 'テスト会議2の要約');

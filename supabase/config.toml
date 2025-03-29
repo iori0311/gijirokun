@@ -94,6 +94,12 @@ file_size_limit = "50MiB"
 # [storage.image_transformation]
 # enabled = true
 
+# Configure storage buckets
+[storage.buckets.audio-files]
+public = false
+file_size_limit = "50MB"
+allowed_mime_types = ["audio/mpeg", "audio/x-m4a", "audio/wav"]
+
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
 # public = false

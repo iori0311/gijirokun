@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:storage": "NODE_OPTIONS='--experimental-vm-modules --trace-warnings --inspect' DEBUG=vitest:* vitest run tests/integration/storage/storage.test.ts"
+    "test:storage": "NODE_OPTIONS='--experimental-vm-modules' vitest run tests/integration/storage/storage.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

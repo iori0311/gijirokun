@@ -31,6 +31,7 @@ const formatAuthError = (error: Error | AuthApiError): AuthError => {
  * メールアドレスとパスワードでログインする
  */
 export const login = async (email: string, password: string) => {
+  try {
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -41,12 +42,16 @@ export const login = async (email: string, password: string) => {
   }
 
   return { error: null }
+  } catch (error) {
+     return { error: formatAuthError(error as Error) }
+  }
 }
 
 /**
  * Google認証でログインする
  */
 export const loginWithGoogle = async () => {
+  try {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -57,14 +62,17 @@ export const loginWithGoogle = async () => {
   if (error) {
     return { error: formatAuthError(error) }
   }
-
   return { error: null }
+  } catch (error) {
+    return { error: formatAuthError(error as Error) }
+  }
 }
 
 /**
  * メールアドレスとパスワードで登録する
  */
 export const register = async (email: string, password: string) => {
+  try {
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -78,17 +86,25 @@ export const register = async (email: string, password: string) => {
   }
 
   return { error: null }
+  } catch (error) {
+    return { error: formatAuthError(error as Error) }
+  }
 }
 
 /**
  * ログアウトする
  */
 export const logout = async () => {
+  try {
   const { error } = await supabase.auth.signOut()
   
   if (error) {
-    return { error: formatAuthError(error) }
+      console.error('Logout error:', error)
   }
   
   redirect('/')
+  } catch (error) {
+     console.error('Failed to execute logout:', error)
+     return { error: formatAuthError(error as Error) }
+  }
 } 

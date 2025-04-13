@@ -1,4 +1,4 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient, SupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { redirect } from 'next/navigation'
 import { AuthApiError } from '@supabase/supabase-js'
 
@@ -8,8 +8,8 @@ export type AuthError = {
   type?: string
 }
 
-// Supabaseクライアントの作成
-const supabase = createClientComponentClient()
+// Supabaseクライアントのインスタンス (遅延初期化)
+let supabaseInstance: SupabaseClient | null = null;
 
 // Supabaseのエラーをアプリケーションのエラー形式に変換する
 const formatAuthError = (error: Error | AuthApiError): AuthError => {
@@ -27,10 +27,19 @@ const formatAuthError = (error: Error | AuthApiError): AuthError => {
   }
 }
 
+// Supabaseクライアント取得関数
+const getSupabaseClient = (): SupabaseClient => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClientComponentClient();
+  }
+  return supabaseInstance;
+}
+
 /**
  * メールアドレスとパスワードでログインする
  */
 export const login = async (email: string, password: string) => {
+  const supabase = getSupabaseClient();
   try {
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -51,6 +60,7 @@ export const login = async (email: string, password: string) => {
  * Google認証でログインする
  */
 export const loginWithGoogle = async () => {
+  const supabase = getSupabaseClient();
   try {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -72,6 +82,7 @@ export const loginWithGoogle = async () => {
  * メールアドレスとパスワードで登録する
  */
 export const register = async (email: string, password: string) => {
+  const supabase = getSupabaseClient();
   try {
   const { error } = await supabase.auth.signUp({
     email,
@@ -95,16 +106,19 @@ export const register = async (email: string, password: string) => {
  * ログアウトする
  */
 export const logout = async () => {
+  const supabase = getSupabaseClient(); 
+  let logoutError: AuthError | null = null; // エラー保持用変数
   try {
-  const { error } = await supabase.auth.signOut()
-  
-  if (error) {
-      console.error('Logout error:', error)
-  }
-  
-  redirect('/')
+    const { error } = await supabase.auth.signOut(); // data を削除
+    
+    if (error) {
+        logoutError = formatAuthError(error); // エラーを保持
+    }
   } catch (error) {
-     console.error('Failed to execute logout:', error)
-     return { error: formatAuthError(error as Error) }
+     logoutError = formatAuthError(error as Error); // エラーを保持
+  } finally {
+      redirect('/');
   }
+  // テスト用: ログアウト処理のエラー結果を返す (本番環境では redirect が先に実行される想定)
+  return { error: logoutError }; 
 } 

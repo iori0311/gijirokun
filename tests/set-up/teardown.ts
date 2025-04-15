@@ -6,7 +6,6 @@ export async function teardown() {
     try {
         // DBリセット
         execSync('supabase db reset --no-seed', { stdio: 'inherit'});
-        execSync('PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres -f tests/set-up/test-seed.sql', { stdio: 'inherit'})
         
         // ローカルのSupabaseから動的にキーを取得
         const SUPABASE_URL = 'http://127.0.0.1:54321';

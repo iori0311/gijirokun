@@ -1,7 +1,7 @@
--- トリガーの無効化
-ALTER TABLE meetings DISABLE TRIGGER ALL;
-ALTER TABLE transcriptions DISABLE TRIGGER ALL;
-ALTER TABLE summaries DISABLE TRIGGER ALL;
+-- ユーザートリガーの無効化
+ALTER TABLE meetings DISABLE TRIGGER USER;
+ALTER TABLE transcriptions DISABLE TRIGGER USER;
+ALTER TABLE summaries DISABLE TRIGGER USER;
 
 -- 既存データのクリーンアップ（依存関係を考慮した順序で）
 DELETE FROM summaries;

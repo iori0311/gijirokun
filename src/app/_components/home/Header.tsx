@@ -1,8 +1,8 @@
 'use client'
 
-import { useAuth } from '../../../_contexts/AuthContext'
-import { logout } from '../../../_lib/auth'
-import Button from '../../../_components/ui/Button'
+import { useAuth } from '../../_contexts/AuthContext'
+import { logout } from '../../_lib/auth'
+import Button from '../ui/Button'
 
 export default function Header() {
   const { user } = useAuth()

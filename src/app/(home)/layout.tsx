@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import Header from './_components/home/Header'
+import Header from '../_components/home/Header'
 
 export const metadata: Metadata = {
   title: {

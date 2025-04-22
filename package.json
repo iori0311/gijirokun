@@ -7,26 +7,40 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:storage": "NODE_OPTIONS='--experimental-vm-modules' vitest run tests/integration/storage/storage.test.ts"
+    "test": "vitest run",
+    "test:storage": "NODE_OPTIONS='--experimental-vm-modules' vitest run tests/integration/storage/storage.test.ts",
+    "test:auth": "vitest run tests/unit/auth.test.ts"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^4.1.3",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.39.0",
+    "@tailwindcss/forms": "^0.5.10",
     "axios": "^1.8.4",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "uuid": "^11.1.0"
+    "react-hook-form": "^7.55.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
+    "jsdom": "^26.0.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.0.9"

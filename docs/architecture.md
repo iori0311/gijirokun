@@ -403,7 +403,6 @@ sequenceDiagram
 graph TD
     subgraph Auth["認証フロー"]
         Google["Googleログイン"]
-        Magic["マジックリンク認証"]
         Token["JWTトークン"]
         Session["セッション管理"]
     end
@@ -411,10 +410,8 @@ graph TD
     User((ユーザー))
     
     User --> Google
-    User --> Magic
     
     Google --> Token
-    Magic --> Token
     Token --> Session
     
     classDef auth fill:#f9f,stroke:#333,stroke-width:2px;

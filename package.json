@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:storage": "NODE_OPTIONS='--experimental-vm-modules' vitest run tests/integration/storage/storage.test.ts"
+    "test:storage": "NODE_OPTIONS='--experimental-vm-modules' vitest run tests/integration/storage/storage.test.ts",
+    "test:auth": "vitest run tests/unit/auth.test.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

@@ -10,7 +10,7 @@ if (fs.existsSync('.env.test')) {
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
+    environment: 'node',
     include: [
       'tests/integration/storage/**/*.test.ts',
       '**/*.{test,spec}.{js,jsx,ts,tsx}'
